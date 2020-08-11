@@ -19,7 +19,7 @@ title: DeepLabv3+
 * DeepLabv3+はDeepLabv3に物体領域を詳細に復元するための効率的なdecoderを追加した
 * Depthwise separable convolutionとXceptionを採用した
 * Atrous separable convolutionをASPPとdecoderモジュールの両方に適用した
-[Image](deeplabv3plus/830A0C7D-7025-480D-8D70-DB81CDC66102.png)
+![Image](deeplabv3plus/830A0C7D-7025-480D-8D70-DB81CDC66102.png)
 Fig. 1
 
 ## 3. Methods
@@ -33,7 +33,7 @@ Fig. 1
 * [論文解説 Depthwise Separable Convolution for Neural Machine Translation (SliceNet) - ディープラーニングブログ](http://deeplearning.hatenablog.com/entry/slicenet)
 * [MobileNets: CNNのサイズ・計算コストの削減手法＿翻訳・要約 - Qiita](https://qiita.com/HiromuMasuda0228/items/7dd0b764804d2aa199e4)
 * Depthwise convolution（1chのフィルタを入力ch数分用意し、各chに各フィルタを掛け合わせ、入力と同じ解像度・ch数のマップを得る畳み込み操作）後、pointwise convoluttion（1x1x in-ch x out-chのフィルタで畳み込みをする）
-[Image](deeplabv3plus/4A1B00DA-9253-4FB9-A28D-D94BFEB1C491.png)
+![Image](deeplabv3plus/4A1B00DA-9253-4FB9-A28D-D94BFEB1C491.png)
 
 #### DeepLabv3 as encoder:
 * DeepLabv3は異なるrateでAtrous convolutionをかけることによりASPPモジュールを拡張している
@@ -47,7 +47,7 @@ Fig. 1
 * 結合後はいくつか3x3convolutionを行い特徴マップを補正し、その後bilinearに4倍のアップサンプリングをかける
 * 本論文ではoutput stride = 16が精度と速度のバランスが最も良かった
 
-[Image](deeplabv3plus/C0EA69A9-E193-4686-8273-6AEB1D967E1A.png)
+![Image](deeplabv3plus/C0EA69A9-E193-4686-8273-6AEB1D967E1A.png)
 Fig. 2
 
 ### 3.2 Modified Aligned Xception
@@ -56,7 +56,7 @@ Fig. 2
 * 2. Atrous separable convolutionを適用し任意の解像度の特徴マップを得るため、Max poolingをdepthwise separable convolution with stridingに置き換えた
 * 3. Batch NormalizationとReLUをそれぞれの3x3 depthwise convolutionのあとに追加した
 
-[Image](deeplabv3plus/2AEACE85-5B25-4D35-A32C-99E48020244B.png)
+![Image](deeplabv3plus/2AEACE85-5B25-4D35-A32C-99E48020244B.png)
 Fig. 4 Modified Alighned Xception
 
 ## 4. Experimental Evaluation
