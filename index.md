@@ -19,13 +19,19 @@ title: 論文メモ
 * PSPNet [Pyramid Scene Parsing Network] [&#x1f4c4;](https://arxiv.org/abs/1612.01105)
 * Segmentation Using DL : Survey [Image Segmentation Using Deep Learning: A Survey] [&#x1f4c4;](https://arxiv.org/abs/2001.05566)
 * CRF as RNN [Conditional Random Fields as Recurrent Neural Networks] [&#x1f4c4;](https://arxiv.org/abs/1502.03240)
-* [&#x1f4c4;]./papers/semseg/deeplabv3plus.html>DeepLabv3+ [Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation] [&#x1f4c4;](https://arxiv.org/abs/1802.02611)
+* [DeepLabv3+](./papers/semseg/deeplabv3plus.html) [Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation] [&#x1f4c4;](https://arxiv.org/abs/1802.02611)
     * CRFなどのポストプロセスなしでPASCAL VOC2012で89.0%、CItyscapesで82.1%を達成
     * DeepLabv3+はシンプルながら効率的なデコーダーをDeepLabv3に追加し、オブジェクトの輪郭部の結果を改善した
     * Xceptionを改良し、depth-wiseかつseparableな畳み込みをAtrous Spatial Pyramid Poolingとデコーダーに適用し、より高速でロバストなencoder-decoderネットワークを開発した
+
 # Object Detection
+
 # GANs
+
 # Image Captioning
+
 # Pointcloud
+
 # Localization
+
 # Dataset
