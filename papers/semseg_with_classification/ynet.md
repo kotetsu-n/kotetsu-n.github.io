@@ -1,6 +1,6 @@
 ---
 layout: default
-title: DeepLabv3+
+title: Y-Net
 ---
 
 # Y-Net: Joint Segmentation and Classification for Diagnosis of Breast Biopsy Images
@@ -20,7 +20,7 @@ title: DeepLabv3+
 * これらの2つの出力はROI全体のセグメンテーションマスクを生成するために結合される
 * Instance-levelの確率マップは4つの診断カテゴリのうちの一つに該当する確率の最大値が含まれる？
 * 2値化した上記マップとSegmentation maskを掛け合わせ、discriminativeなセグメンテーションマスクを生成する（不必要な箇所を落としたセグメンテーションマスク）
-[image:ynet/BB8B9AAD-B6D8-4EA7-A1D0-B2F88C4414D2.png]
+[Image](ynet/BB8B9AAD-B6D8-4EA7-A1D0-B2F88C4414D2.png)
 
 ### 2.1 Y-Net Architecture
 #### Y-Net
@@ -32,18 +32,18 @@ title: DeepLabv3+
 * U-Netではencoder／decoderどちらもそれぞれ同じconvolutionalブロックを積み重ねて
 * Y-Netではこの表現を抽象化し、convolutionalブロックをencode/decodeの一般的なブロックとして表現し、各深さで同じブロックを使うことを強制されないようにした（意味は分かるが実際が不明
 
-[image:ynet/7AB4AD0B-618C-423D-8AED-6BC04698C092.png]
-[image:ynet/59C752ED-70F0-4C34-A21C-9E2ACB255E24.png]
+[Image](ynet/7AB4AD0B-618C-423D-8AED-6BC04698C092.png)
+[Image](ynet/59C752ED-70F0-4C34-A21C-9E2ACB255E24.png)
 
 #### その他の工夫
 * 2つのハイパーパラメーターを採用し、モデルの大きさを簡単に変えられるようにした (width multipier: w, depth-multiplier: d)
 * U-Netのskip-connectionはencoding->decodingの同じステージだけだったのに対し、Y-Netではステージごとに最初のencodingブロックから最後のencodingブロックへのskip-connectionを追加した（segmentationの改善のため
 * 学習時はまずY-Netをセグメンテーション向けに学習し、その後にspatial level4以降を追加し、segmentationとclassificationを学習した
-* Loss functionは[image:ynet/39A8C7F7-4FDC-43BC-B2C4-4F8EC4CB6181.png]で、Lseg, Lclsはどちらも”multi-nominal” crossEntropy Loss function
+* Loss functionは[Image](ynet/39A8C7F7-4FDC-43BC-B2C4-4F8EC4CB6181.png)で、Lseg, Lclsはどちらも”multi-nominal” crossEntropy Loss function
 
 ### 2.2 Discriminative Instance Selection
 * Y-Netの出力zは各診断分類に対応しておりSoftmaxで正規化される
-* もしmax(z)>Γの場合には診断に寄与しているとみなすことができる (Γはhttps://arxiv.org/pdf/1504.07947.pdf）
+* もしmax(z)>Γの場合には診断に寄与しているとみなすことができる (Γは[ここを参照](https://arxiv.org/pdf/1504.07947.pdf)）
 
 ### 2.3 Diagnostic Classification
 

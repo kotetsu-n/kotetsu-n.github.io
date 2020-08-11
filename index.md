@@ -52,5 +52,5 @@ title: 論文メモ
 # Dataset
 1. CMP [CMP Facade Database](http://cmp.felk.cvut.cz/~tylecr1/facade/)
 
-- [ ] Thin structure reconstruction [Vid2Curve: Simultaneous Camera Motion Estimation and Thin Structure Reconstruction from an RGB Video](https://arxiv.org/abs/2005.03372)
-- [ ] Structured3D: A Large Photo-realistic Dataset for Structured 3D Modeling https://arxiv.org/abs/1908.00222
+[ ] Thin structure reconstruction [Vid2Curve: Simultaneous Camera Motion Estimation and Thin Structure Reconstruction from an RGB Video](https://arxiv.org/abs/2005.03372)
+[ ] Structured3D: A Large Photo-realistic Dataset for Structured 3D Modeling https://arxiv.org/abs/1908.00222
