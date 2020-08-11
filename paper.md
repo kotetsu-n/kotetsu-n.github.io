@@ -1,3 +1,8 @@
+---
+layout: default
+title: 論文メモ
+---
+
 # やったこと
 ## Paper Submission
 * ISARC2020
