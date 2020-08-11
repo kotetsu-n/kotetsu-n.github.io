@@ -1,3 +1,8 @@
+---
+layout: default
+title: DeepLabv3+
+---
+
 # Y-Net: Joint Segmentation and Classification for Diagnosis of Breast Biopsy Images
 ## Abstract
 * Y-NetはU-Netに識別マップを生成するための並列なパスを追加し、かつConvブロックのモジュラー性をサポートしている
