@@ -24,7 +24,7 @@ title: 論文メモ
     * Xceptionを改良し、depth-wiseかつseparableな畳み込みをAtrous Spatial Pyramid Poolingとデコーダーに適用し、より高速でロバストなencoder-decoderネットワークを開発した
 
 # Classifier with SemSeg Network
-1. Y-Net [Y-Net: Joint Segmentation and Classification for Diagnosis of Breast Biopsy Images] [link](https://homes.cs.washington.edu/~shapiro/sachin-miccai18.pdf) [&#x1f4c4;](https://arxiv.org/abs/1806.01313)
+1. [Y-Net](./papers/semseg_with_classification/ynet.md) [Y-Net: Joint Segmentation and Classification for Diagnosis of Breast Biopsy Images] [link](https://homes.cs.washington.edu/~shapiro/sachin-miccai18.pdf) [&#x1f4c4;](https://arxiv.org/abs/1806.01313)
 2. Combining Bottom-Up, Top-Down, and Smoothness Cues for Weakly Supervised Image Segmentation [&#x1f4c4;](http://web.engr.oregonstate.edu/~sinisa/research/publications/cvpr17_segmentation.pdf)
 3. From Image-level to Pixel-level Labeling with Convolutional Networks* [&#x1f4c4;](https://arxiv.org/pdf/1411.6228.pdf)
 
