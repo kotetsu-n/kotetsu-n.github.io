@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="bear-note-unique-identifier" content="2EA448A7-6F57-4CB2-B69C-1D52218822D7-327-0000520EBC1C2515"
+        <meta name="created" content="2020-08-10T12:23:01-0700"/>
+        <meta name="modified" content="2020-08-10T16:06:46-0700"/>
+        <meta name="tags" content="仕事用, 仕事用/論文メモ, 仕事用/論文メモ/semanticsegmentation"/>
+        <meta name="last device" content="中林拓馬のMacBook Pro"/>
+    </head>
+    <body>
+        <div class="note-wrapper">
+            <h1 id="Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation">Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation</h1>
+<h2 id="Abstract">Abstract</h2>
+<ul><li>DeepLabv3+はシンプルながら効率的なデコーダーをDeepLabv3に追加し、オブジェクトの輪郭部の結果を改善した
+</li><li>Xceptionを追求し、depth-wiseかつseparableな畳み込みをAtrous Spatial Pyramid Poolingとデコーダーに適用し、より高速でロバストなencoder-decoderネットワークを開発した
+</li></ul>
+<br>
+<h2 id="Introduction">Introduction</h2>
+<h3 id="前提・課題">前提・課題</h3>
+<ul><li>DeepLabv3では並列したいくつかのparallel atrous convolutionを異なるrateで適用していた（Atrous Spatial Pyramid Pooling：ASPP）
+</li><li>対して、PSPNetは異なるグリッドスケールでのpooling操作を行っている（Spatial Pyramid Pooling）
+</li><li>いくらセマンティック情報が最終層の特徴マップにエンコードされたとしても、backboneでstrideを設定したpoolingやconvolution操作をすることにより細部、特に輪郭部の情報は失われる
+</li><li>この問題はAtrous convolutionでより密な特徴マップを抽出することで多少改善されるが、計算コストから出力されるマップは入力画像の4-8倍程度小さい解像度となる
+</li><li>一方、encoder-decoderモデルはencoderパスにおける高速な計算と、decoderパスに置いて詳細な物体領域の段階的な復元を可能にする
+</li><li>上記の手法を複合することどちらの利点も活かすことを試みた
+</li><li>DeepLabv3+はDeepLabv3に物体領域を詳細に復元するための効率的なdecoderを追加した
+</li><li>Depthwise separable convolutionとXceptionを採用した
+</li><li>Atrous separable convolutionをASPPとdecoderモジュールの両方に適用した
+</li></ul>
+<p><img src='deeplabv3plus/830A0C7D-7025-480D-8D70-DB81CDC66102.png'></p>
+<p>Fig. 1</p>
+<br>
+<h2 id="3. Methods">3. Methods</h2>
+<h3 id="3.1 Encoder-Decoder with Atrous Convolution">3.1 Encoder-Decoder with Atrous Convolution</h3>
+<h4 id="Atrous convolution:">Atrous convolution:</h4>
+<ul><li>特徴マップの解像度と視野の広さを調整するために重要なテクニック
+</li><li>二次元データの入力の場合は以下のように数式化される
+</li></ul>
+<p><img src='deeplabv3plus/D3931995-2C91-49B8-B6CC-E6E716627A06.png'></p>
+<br>
+<h4 id="Depthwise separable convolution:">Depthwise separable convolution:</h4>
+<ul><li><a href="http://deeplearning.hatenablog.com/entry/slicenet">論文解説 Depthwise Separable Convolution for Neural Machine Translation (SliceNet) - ディープラーニングブログ</a>
+</li><li><a href="https://qiita.com/HiromuMasuda0228/items/7dd0b764804d2aa199e4">MobileNets: CNNのサイズ・計算コストの削減手法＿翻訳・要約 - Qiita</a>
+</li><li>Depthwise convolution（1chのフィルタを入力ch数分用意し、各chに各フィルタを掛け合わせ、入力と同じ解像度・ch数のマップを得る畳み込み操作）後、pointwise convoluttion（1x1x in-ch x out-chのフィルタで畳み込みをする）
+</li></ul>
+<p><img src='deeplabv3plus/4A1B00DA-9253-4FB9-A28D-D94BFEB1C491.png'></p>
+<br>
+<h4 id="DeepLabv3 as encoder:">DeepLabv3 as encoder:</h4>
+<ul><li>DeepLabv3は異なるrateでAtrous convolutionをかけることによりASPPモジュールを拡張している
+</li><li>DeepLabv3+ではオリジナルのDeepLabv3にてlogitsをする前の最後の特長マップをencoderのアウトプットとした
+</li><li>計算資源によってはatrous convolutionを適用することにより任意の解像度の特徴マップを出力できる
+</li></ul>
+<br>
+<h4 id="Proposed decoder:">Proposed decoder:</h4>
+<ul><li>DeepLabv3のEncoderの特徴マップは通常 output stride = 16に設定される
+</li><li>DeepLabv3+では、Encoderの特徴はまずBilinearに4倍になるようアップサンプリングされ、backboneから出力される同一の空間解像度を持つlow-level の特徴マップに結合される（例えば、ResNet-101のstride前のConv2）
+</li><li>low-levelの特徴マップのチャンネル数を落とすため、1x1convolutionを行う
+</li><li>結合後はいくつか3x3convolutionを行い特徴マップを補正し、その後bilinearに4倍のアップサンプリングをかける
+</li><li>本論文ではoutput stride = 16が精度と速度のバランスが最も良かった
+</li></ul>
+<br>
+<p><img src='deeplabv3plus/C0EA69A9-E193-4686-8273-6AEB1D967E1A.png'></p>
+<p>Fig. 2</p>
+<br>
+<h3 id="3.2 Modified Aligned Xception">3.2 Modified Aligned Xception</h3>
+<ul><li>MSRAのXception改良版をベースにして以下の3つの変更を加えた
+</li><li>1. Deeper Xception（速度とメモリの効率を考えてentry flowの改良は採用していない
+</li><li>2. Atrous separable convolutionを適用し任意の解像度の特徴マップを得るため、Max poolingをdepthwise separable convolution with stridingに置き換えた
+</li><li>3. Batch NormalizationとReLUをそれぞれの3x3 depthwise convolutionのあとに追加した
+</li></ul>
+<br>
+<p><img src='deeplabv3plus/2AEACE85-5B25-4D35-A32C-99E48020244B.png'></p>
+<p>Fig. 4 Modified Alighned Xception</p>
+<br>
+<h2 id="4. Experimental Evaluation">4. Experimental Evaluation</h2>
+<ul><li>初期学習率は0.007、poly policyにてscheduling
+</li><li>crop sizeは513
+</li><li>output stride = 16のときにbatch normalizationのパラメータをfine-tuning？
+</li><li>学習時に入力データをrandom scaling
+</li><li>本モデルはend-to-endで学習した
+</li></ul>
+<br>
+<h3 id="4.1 Decoder Design Choices">4.1 Decoder Design Choices</h3>
+<ul><li>いろいろパラメータを変えて精度の良かったDecoderを追求している
+</li></ul>
+<br>
+<p><span class='hashtag'>#仕事用/論文メモ/semanticsegmentation</span></p>
+<br>
+
+        </div>
+        <script type="text/javascript">
+            (function() {
+
+    var doc_ols = document.getElementsByTagName("ol");
+
+    for ( i=0; i<doc_ols.length; i++) {
+
+        var ol_start = doc_ols[i].getAttribute("start") - 1;
+        doc_ols[i].setAttribute("style", "counter-reset:ol_counter " + ol_start + ";");
+
+    }
+
+})();
+
+        </script>
+        <style>
+            html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;font:inherit;font-size:100%;vertical-align:baseline}html{line-height:1}ol,ul{list-style:none}table{border-collapse:collapse;border-spacing:0}caption,th,td{text-align:left;font-weight:normal;vertical-align:middle}q,blockquote{quotes:none}q:before,q:after,blockquote:before,blockquote:after{content:"";content:none}a img{border:none}article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section,summary{display:block}*{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}html{font-size:87.5%;line-height:1.57143em}html{font-size:14px;line-height:1.6em;-webkit-text-size-adjust:100%}body{background:#fcfcfc;color:#545454;text-rendering:optimizeLegibility;font-family:"AvenirNext-Regular"}a{color:#de4c4f;text-decoration:none}h1{font-family:"AvenirNext-Medium";color:#333;font-size:1.6em;line-height:1.3em;margin-bottom:.78571em}h2{font-family:"AvenirNext-Medium";color:#333;font-size:1.3em;line-height:1em;margin-bottom:.62857em}h3{font-family:"AvenirNext-Medium";color:#333;font-size:1.15em;line-height:1em;margin-bottom:.47143em}p{margin-bottom:1.57143em;hyphens:auto}hr{height:1px;border:0;background-color:#dedede;margin:-1px auto 1.57143em auto}ul,ol{margin-bottom:.31429em}ul ul,ul ol,ol ul,ol ol{margin-bottom:0px}ol{counter-reset:ol_counter}ol li:before{content:counter(ol_counter) ".";counter-increment:ol_counter;color:#e06e73;text-align:right;display:inline-block;min-width:1em;margin-right:0.5em}b,strong{font-family:"AvenirNext-Bold"}i,em{font-family:"AvenirNext-Italic"}code{font-family:"Menlo-Regular"}.text-overflow-ellipsis{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sf_code_string,.sf_code_selector,.sf_code_attr-name,.sf_code_char,.sf_code_builtin,.sf_code_inserted{color:#D33905}.sf_code_comment,.sf_code_prolog,.sf_code_doctype,.sf_code_cdata{color:#838383}.sf_code_number,.sf_code_boolean{color:#0E73A2}.sf_code_keyword,.sf_code_atrule,.sf_code_rule,.sf_code_attr-value,.sf_code_function,.sf_code_class-name,.sf_code_class,.sf_code_regex,.sf_code_important,.sf_code_variable,.sf_code_interpolation{color:#0E73A2}.sf_code_property,.sf_code_tag,.sf_code_constant,.sf_code_symbol,.sf_code_deleted{color:#1B00CE}.sf_code_macro,.sf_code_entity,.sf_code_operator,.sf_code_url{color:#920448}.note-wrapper{max-width:46em;margin:0px auto;padding:1.57143em 3.14286em}.note-wrapper.spotlight-preview{overflow-x:hidden}u{text-decoration:none;background-image:linear-gradient(to bottom, rgba(0,0,0,0) 50%,#e06e73 50%);background-repeat:repeat-x;background-size:2px 2px;background-position:0 1.05em}s{color:#878787}p{margin-bottom:0.1em}hr{margin-bottom:0.7em;margin-top:0.7em}ul li{text-indent:-0.35em}ul li:before{content:"•";color:#e06e73;display:inline-block;margin-right:0.3em}ul ul{margin-left:1.25714em}ol li{text-indent:-1.45em}ol ol{margin-left:1.25714em}blockquote{display:block;margin-left:-1em;padding-left:0.8em;border-left:0.2em solid #e06e73}.todo-list ul{margin-left:1.88571em}.todo-list li{text-indent:-1.75em}.todo-list li:before{content:"";display:static;margin-right:0px}.todo-checkbox{text-indent:-1.7em}.todo-checkbox svg{margin-right:0.3em;position:relative;top:0.2em}.todo-checkbox svg #check{display:none}.todo-checkbox.todo-checked #check{display:inline}.todo-checkbox.todo-checked+.todo-text{text-decoration:line-through;color:#878787}.code-inline{display:inline;background:white;border:solid 1px #dedede;padding:0.2em 0.5em;font-size:0.9em}.code-multiline{display:block;background:white;border:solid 1px #dedede;padding:0.7em 1em;font-size:0.9em;overflow-x:auto}.hashtag{display:inline-block;color:white;background:#b8bfc2;padding:0.0em 0.5em;border-radius:1em;text-indent:0}.hashtag a{color:#fff}.address a{color:#545454;background-image:linear-gradient(to bottom, rgba(0,0,0,0) 50%,#0da35e 50%);background-repeat:repeat-x;background-size:2px 2px;background-position:0 1.05em}.address svg{position:relative;top:0.2em;display:inline-block;margin-right:0.2em}.color-preview{display:inline-block;width:1em;height:1em;border:solid 1px rgba(0,0,0,0.3);border-radius:50%;margin-right:0.1em;position:relative;top:0.2em;white-space:nowrap}.color-code{margin-right:0.2em;font-family:"Menlo-Regular";font-size:0.9em}.color-hash{opacity:0.4}.ordered-list-number{color:#e06e73;text-align:right;display:inline-block;min-width:1em}.arrow svg{position:relative;top:0.08em;display:inline-block;margin-right:0.15em;margin-left:0.15em}.arrow svg #rod{stroke:#545454}.arrow svg #point{fill:#545454}mark{color:inherit;display:inline;padding:0.2em 0.5em;background-color:#fcffc0}img{max-width:100%;height:auto}
+
+        </style>
+    </body>
+</html>
